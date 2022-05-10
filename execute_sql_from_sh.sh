@@ -23,7 +23,7 @@ parameters :
 
 this script does the following:
 
-1. Executes a .sql file, which generates files with reports
+1. Receive parameters from operating system, send them to the .sql file, which generates files with reports
 2. Sends the generated reports by mail
 3. Erases temporary files
 */
@@ -52,16 +52,16 @@ case $vHOST in
 		break;;
 
 	ttlux02)
-		DIR_LOG=/home/billing/scripts/EXECUTE/1og
-		DIR_SOL=/home/billing/scripts/EXECUTE/sql
+		DIR_LOG=/home/billing/scripts/EXECUTE/log
+		DIR_SQL=/home/billing/scripts/EXECUTE/sql
 		MSG_LOG=$DIR_LOG/reports_post_billing.log
 		BASE=HPUXDEV1
 		MAIL_SYS=" daniel.campos@testmail.com "
 		break;;
 
 	*)	
-		DIR_LOG=/home/billing/scripts/EXECUTE/1og
-		DIR_SOL=/home/billing/scripts/EXECUTE/sql
+		DIR_LOG=/home/billing/scripts/EXECUTE/log
+		DIR_SQL=/home/billing/scripts/EXECUTE/sql
 		MSG_LOG=$DIR_LOG/reports_post_billing.log
 		BASE=HPUXDEV1
 		MAIL_SYS=" daniel.campos@testmail.com "
@@ -85,12 +85,9 @@ echo "------------------------------------+------------+------------------------
 echo $(date +"%Y/%m/%d %H:%M:%S") " start with reports_post_billing.sql " >> $MSG_LOG
 
 sqlplus -s /@${BASE} <<EOF 1>>$MSG_LOG 2>>$MSG_LOG
-
 set serveroutput on size 1000000
 WHENEVER SQLERROR EXIT 1
-
 @${DIR_SQL}/reports_post_billing.sql ${DATE_FROM} ${DATE_TO} ${CICLO} >> $MSG_LOG
-
 EOF
 
 if [ $? -eq 0 ]
